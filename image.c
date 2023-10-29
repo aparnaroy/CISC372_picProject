@@ -118,5 +118,5 @@ int main(int argc,char** argv){
     free(destImage.data);
     t2=time(NULL);
     printf("Took %ld seconds\n",t2-t1);
-   return 0;
+    return 0;
 }

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include "image.h"
-#include <pthread.h>
+#include <omp.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -77,25 +77,16 @@ uint8_t getPixelValue(Image* srcImage,int x,int y,int bit,Matrix algorithm){
     }
 }*/
 
-// This edited convolute method is now the thread method
-void* convolute_pthreads(void* args){
-    ThreadArgs* threadArgs = (ThreadArgs*)args;
-    Image* srcImage = threadArgs->srcImage;
-    Image* destImage = threadArgs->destImage;
-    Matrix* algorithm = threadArgs->algorithm;
-    long thread_rank = threadArgs->thread_rank;
-    int thread_count = threadArgs->thread_count;
+// This edited convolute method is now the OpenMP method
+void convolute(Image* srcImage,Image* destImage,Matrix algorithm){
+    int row,pix,bit,span;
+    span=srcImage->bpp*srcImage->bpp;
 
-    int rowsPerThread = srcImage->height / thread_count;
-    int startRow = thread_rank * rowsPerThread;
-    int endRow = (thread_rank == thread_count - 1) ? srcImage->height : (thread_rank + 1) * rowsPerThread;
-
-    int row, pix, bit;
-
-    for (row = startRow; row < endRow; row++) {
-        for (pix = 0; pix < srcImage->width; pix++) {
-            for (bit = 0; bit < srcImage->bpp; bit++) {
-                destImage->data[Index(pix, row, srcImage->width, bit, srcImage->bpp)] = getPixelValue(srcImage, pix, row, bit, *algorithm);
+    #pragma omp parallel for private(row, pix, bit)
+    for (row=0;row<srcImage->height;row++){
+        for (pix=0;pix<srcImage->width;pix++){
+            for (bit=0;bit<srcImage->bpp;bit++){
+                destImage->data[Index(pix,row,srcImage->width,bit,srcImage->bpp)]=getPixelValue(srcImage,pix,row,bit,algorithm);
             }
         }
     }
@@ -127,7 +118,7 @@ int main(int argc,char** argv){
     t1=time(NULL);
 
     stbi_set_flip_vertically_on_load(0); 
-    if (argc!=4) return Usage();
+    if (argc!=3) return Usage();
     char* fileName=argv[1];
     if (!strcmp(argv[1],"pic4.jpg")&&!strcmp(argv[2],"gauss")){
         printf("You have applied a gaussian filter to Gauss which has caused a tear in the time-space continum.\n");
@@ -144,32 +135,7 @@ int main(int argc,char** argv){
     destImage.height=srcImage.height;
     destImage.width=srcImage.width;
     destImage.data=malloc(sizeof(uint8_t)*destImage.width*destImage.bpp*destImage.height);
-
-    // pthreads Code:
-    long thread;
-    pthread_t* thread_handles;
-    int thread_count = strtol(argv[3], NULL, 10);
-    thread_handles = (pthread_t*)malloc(thread_count * sizeof(pthread_t));
-    ThreadArgs* threadArgs = malloc(thread_count * sizeof(ThreadArgs));
-
-    for (thread = 0; thread < thread_count; thread++) {
-        threadArgs[thread].srcImage = &srcImage;
-        threadArgs[thread].destImage = &destImage;
-        threadArgs[thread].algorithm = &algorithms[type];
-        threadArgs[thread].thread_rank = thread;
-        threadArgs[thread].thread_count = thread_count;
-        pthread_create(&thread_handles[thread], NULL, &convolute_pthreads, &threadArgs[thread]);
-    }
-
-    for (thread = 0; thread < thread_count; thread++) {
-        pthread_join(thread_handles[thread], NULL);
-    }
-
-    free(thread_handles);
-    free(threadArgs);
-
-    //convolute(&srcImage,&destImage,algorithms[type]);
-    
+    convolute(&srcImage,&destImage,algorithms[type]);
     stbi_write_png("output.png",destImage.width,destImage.height,destImage.bpp,destImage.data,destImage.bpp*destImage.width);
     stbi_image_free(srcImage.data);
     
