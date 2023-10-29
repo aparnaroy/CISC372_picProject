@@ -11,7 +11,7 @@ typedef struct{
     int bpp;
 } Image;
 
-enum KernelTypes{EDGE=0,SHARPEN=1,BLUR=2,GAUSE_BLUR=3,EMBOSS=4,IDENTITY=5};
+enum KernelTypes{EDGE=0,SHARPEN=1,BLUR=2,GAUSS_BLUR=3,EMBOSS=4,IDENTITY=5};
 
 typedef double Matrix[3][3];
 

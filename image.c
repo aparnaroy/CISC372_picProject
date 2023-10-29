@@ -82,7 +82,7 @@ enum KernelTypes GetKernelType(char* type){
     if (!strcmp(type,"edge")) return EDGE;
     else if (!strcmp(type,"sharpen")) return SHARPEN;
     else if (!strcmp(type,"blur")) return BLUR;
-    else if (!strcmp(type,"gauss")) return GAUSE_BLUR;
+    else if (!strcmp(type,"gauss")) return GAUSS_BLUR;
     else if (!strcmp(type,"emboss")) return EMBOSS;
     else return IDENTITY;
 }
