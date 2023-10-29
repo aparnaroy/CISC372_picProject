@@ -88,7 +88,12 @@ void* convolute_pthreads(void* args){
 
     int rowsPerThread = srcImage->height / thread_count;
     int startRow = thread_rank * rowsPerThread;
-    int endRow = (thread_rank == thread_count - 1) ? srcImage->height : (thread_rank + 1) * rowsPerThread;
+    int endRow;
+    if (thread_rank == thread_count - 1) {
+        endRow = srcImage->height;
+    } else {
+        endRow = (thread_rank + 1) * rowsPerThread;
+    }
 
     int row, pix, bit;
 
