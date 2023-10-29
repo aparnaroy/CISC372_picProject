@@ -78,7 +78,7 @@ uint8_t getPixelValue(Image* srcImage,int x,int y,int bit,Matrix algorithm){
 }*/
 
 // This edited convolute method is now the thread method
-void* convolute(void* args){
+void* convolute_pthreads(void* args){
     ThreadArgs* threadArgs = (ThreadArgs*)args;
     Image* srcImage = threadArgs->srcImage;
     Image* destImage = threadArgs->destImage;
@@ -158,7 +158,7 @@ int main(int argc,char** argv){
         threadArgs[thread].algorithm = &algorithms[type];
         threadArgs[thread].thread_rank = thread;
         threadArgs[thread].thread_count = thread_count;
-        pthread_create(&thread_handles[thread], NULL, &convolute, &threadArgs[thread]);
+        pthread_create(&thread_handles[thread], NULL, &convolute_pthreads, &threadArgs[thread]);
     }
 
     for (thread = 0; thread < thread_count; thread++) {
