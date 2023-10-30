@@ -1,0 +1,9 @@
+Script started on Mon Oct 30 16:58:30 2023
+]0;aparnar@r1n00.darwin:~/CISC372_picProject[?1034h[aparnar@r1n00 CISC372_picProject]$ exit[13@script output.txtexport OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK[aparnar@r1n00 CISC372_picProject]$ exit[Ksrun ./img_openmp pic1.jpg edgepthreads pic1.jpg edge 30
+Took 7 seconds
+]0;aparnar@r1n00.darwin:~/CISC372_picProject[aparnar@r1n00 CISC372_picProject]$ srun ./img_pthreads pic1.jpg edge 30exit[K[13@script output.txtexport OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK[aparnar@r1n00 CISC372_picProject]$ exit[Ksrun ./img_openmp pic1.jpg edge
+Took 6 seconds
+]0;aparnar@r1n00.darwin:~/CISC372_picProject[aparnar@r1n00 CISC372_picProject]$ exit
+exit
+
+Script done on Mon Oct 30 16:58:58 2023
